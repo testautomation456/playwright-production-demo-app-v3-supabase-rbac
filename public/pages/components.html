@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Components | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="components-title">UI Components Lab</h1><p>Dynamic modern web elements for Playwright UI automation.</p></div></div>
+    <section class="grid cols-2">
+      <div class="card"><h2>Dialogs and messages</h2><div class="inline"><button class="btn" data-open-modal data-testid="open-modal">Open modal</button><button class="btn secondary" data-toast>Toast</button><button class="btn secondary" data-alert>Alert</button><button class="btn secondary" data-confirm>Confirm</button><button class="btn secondary" data-prompt>Prompt</button></div></div>
+      <div class="card"><h2>Dynamic loader</h2><button class="btn success" data-load-dynamic data-testid="load-dynamic">Load dynamic content</button><div class="card" style="margin-top:12px" data-dynamic-box>Waiting...</div></div>
+      <div class="card"><h2>Tabs</h2><div class="tabs"><button class="btn small secondary" data-tab="Overview">Overview</button><button class="btn small secondary" data-tab="Details">Details</button><button class="btn small secondary" data-tab="History">History</button></div><div class="tab-panel" data-tab-panel>Loaded tab: Overview</div></div>
+      <div class="card accordion"><h2>Accordion</h2><button class="btn secondary" data-accordion="acc-1">Toggle Policy</button><p id="acc-1" hidden class="hint">Policy content is dynamically shown and hidden.</p><button class="btn secondary" data-accordion="acc-2">Toggle Notes</button><p id="acc-2" hidden class="hint">Notes content for automation.</p></div>
+      <div class="card"><h2>Shadow DOM</h2><qa-status-card data-testid="shadow-host"></qa-status-card></div>
+      <div class="card"><h2>Drag and Drop</h2><div class="inline"><div class="pill" draggable="true" data-draggable data-testid="drag-source">Automation card</div><div class="drop-zone" data-drop-zone data-testid="drop-zone">Drop here</div></div></div>
+    </section>
+    <div class="modal-backdrop" data-modal hidden><div class="modal"><h2>Approval modal</h2><p class="hint">This modal is hidden until user action opens it.</p><div class="form-row"><label>Comment</label><input data-testid="modal-comment" placeholder="Enter approval comment"></div><div class="inline"><button class="btn" data-save-modal data-testid="modal-save">Save</button><button class="btn secondary" data-close-modal>Cancel</button></div></div></div>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageComponents()</script>
+</body></html>

@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RBAC Demo App Functional Spec</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F5F6F4;
+  --surface:#FFFFFF;
+  --surface-2:#EDEFEC;
+  --ink:#1A2229;
+  --muted:#57626C;
+  --line:#DBDFDD;
+  --accent:#1F6F78;
+  --accent-ink:#0E4750;
+  --accent-soft:#E4F0EF;
+  --admin:#B23A48;
+  --manager:#C97A2B;
+  --user:#2E7D6B;
+  --code-bg:#EEF0ED;
+  --shadow: 0 1px 2px rgba(20,30,30,.06), 0 8px 24px -16px rgba(20,30,30,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161A;
+    --surface:#161E22;
+    --surface-2:#1C2529;
+    --ink:#E6ECEA;
+    --muted:#93A3A3;
+    --line:#2A3438;
+    --accent:#4FB6BC;
+    --accent-ink:#BFE8E8;
+    --accent-soft:#17282A;
+    --admin:#E4838F;
+    --manager:#E3A75C;
+    --user:#75CBAF;
+    --code-bg:#1B2327;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161A;
+  --surface:#161E22;
+  --surface-2:#1C2529;
+  --ink:#E6ECEA;
+  --muted:#93A3A3;
+  --line:#2A3438;
+  --accent:#4FB6BC;
+  --accent-ink:#BFE8E8;
+  --accent-soft:#17282A;
+  --admin:#E4838F;
+  --manager:#E3A75C;
+  --user:#75CBAF;
+  --code-bg:#1B2327;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.5);
+}
+
+*{box-sizing:border-box;}
+html{ background:var(--bg); }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size:16.5px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.nav-title,.chip,.eyebrow,button,th,.pill{
+  font-family:"IBM Plex Sans","Segoe UI",Arial,sans-serif;
+}
+code, .mono, .kv dt, table.api td.path, .badge, .env-table td:first-child{
+  font-family:"IBM Plex Mono","Consolas",monospace;
+}
+
+h1,h2,h3,h4{ text-wrap:balance; color:var(--ink); font-weight:600; }
+a{ color:var(--accent-ink); }
+
+/* ---------- shell layout ---------- */
+.shell{
+  display:grid;
+  grid-template-columns: 260px minmax(0,1fr);
+  max-width:1320px;
+  margin:0 auto;
+}
+@media (max-width: 900px){
+  .shell{ grid-template-columns: 1fr; }
+  nav.toc{ position:static; height:auto; border-right:none; border-bottom:1px solid var(--line); }
+}
+
+nav.toc{
+  position:sticky;
+  top:0;
+  align-self:start;
+  height:100vh;
+  overflow-y:auto;
+  padding:28px 20px 40px;
+  border-right:1px solid var(--line);
+  background:var(--surface);
+}
+.nav-title{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 4px;
+}
+.nav-sub{
+  font-size:12px;
+  color:var(--muted);
+  margin:0 0 22px;
+  font-family:"IBM Plex Mono",monospace;
+}
+nav.toc ol{ list-style:none; margin:0; padding:0; counter-reset:sec; }
+nav.toc li{ counter-increment: sec; margin:0; }
+nav.toc a{
+  display:flex;
+  gap:9px;
+  align-items:baseline;
+  padding:7px 8px;
+  border-radius:6px;
+  text-decoration:none;
+  color:var(--muted);
+  font-size:13.5px;
+  line-height:1.3;
+}
+nav.toc a:before{
+  content: counter(sec, decimal-leading-zero);
+  font-family:"IBM Plex Mono",monospace;
+  font-size:11px;
+  color:var(--accent);
+  flex:0 0 auto;
+}
+nav.toc a:hover{ background:var(--surface-2); color:var(--ink); }
+
+main{ padding:44px 56px 120px; min-width:0; }
+@media (max-width: 700px){ main{ padding:32px 20px 90px; } }
+
+header.cover{
+  padding-bottom:34px;
+  margin-bottom:40px;
+  border-bottom:1px solid var(--line);
+}
+.eyebrow{
+  display:inline-block;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  background:var(--accent-soft);
+  padding:4px 10px;
+  border-radius:999px;
+  margin-bottom:16px;
+}
+h1.title{ font-size:clamp(28px,4vw,40px); margin:0 0 10px; letter-spacing:-.01em; }
+.dek{ font-size:17px; color:var(--muted); max-width:62ch; margin:0 0 22px; font-family:"Source Serif 4",serif;}
+.meta-row{ display:flex; flex-wrap:wrap; gap:10px 28px; font-size:13px; color:var(--muted); font-family:"IBM Plex Mono",monospace; }
+.meta-row b{ color:var(--ink); font-weight:600; }
+
+section{ margin:0 0 56px; scroll-margin-top:20px; }
+section > h2{
+  font-size:22px;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin:0 0 6px;
+  padding-bottom:10px;
+  border-bottom:2px solid var(--accent);
+}
+section > h2 .num{ font-family:"IBM Plex Mono",monospace; font-size:14px; color:var(--accent); font-weight:600; }
+section > .lede{ color:var(--muted); margin:0 0 20px; max-width:70ch; }
+h3{ font-size:17px; margin:28px 0 10px; }
+p{ margin:0 0 14px; max-width:72ch; }
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  padding:22px 24px;
+  margin:16px 0;
+}
+.diagram-card{ padding:18px 10px 8px; }
+.diagram-card .cap{
+  font-size:12.5px;
+  color:var(--muted);
+  padding:0 14px 14px;
+  font-family:"IBM Plex Mono",monospace;
+}
+.diagram-scroll{ overflow-x:auto; }
+.mermaid{ margin:0; display:flex; justify-content:center; min-width:min-content; }
+.mermaid svg{ max-width:none; }
+
+table{ width:100%; border-collapse:collapse; font-size:14px; }
+.table-scroll{ overflow-x:auto; border:1px solid var(--line); border-radius:10px; }
+thead th{
+  text-align:left;
+  font-size:11.5px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--muted);
+  background:var(--surface-2);
+  padding:10px 14px;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+tbody td{ padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+tbody tr:last-child td{ border-bottom:none; }
+tbody tr:hover{ background:var(--surface-2); }
+td.path{ white-space:nowrap; font-size:13px; }
+td.method{ white-space:nowrap; }
+
+.m{ display:inline-block; font-size:11px; font-weight:600; padding:2px 7px; border-radius:5px; font-family:"IBM Plex Mono",monospace; }
+.m-get{ background:#1F6F7822; color:var(--accent-ink); }
+.m-post{ background:#2E7D6B22; color:var(--user); }
+.m-put{ background:#C97A2B22; color:var(--manager); }
+.m-delete{ background:#B23A4822; color:var(--admin); }
+
+.role-pill{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:2px 9px; border-radius:999px; }
+.role-admin{ background:color-mix(in srgb, var(--admin) 16%, transparent); color:var(--admin); }
+.role-manager{ background:color-mix(in srgb, var(--manager) 18%, transparent); color:var(--manager); }
+.role-user{ background:color-mix(in srgb, var(--user) 16%, transparent); color:var(--user); }
+.dot{ width:7px; height:7px; border-radius:50%; background:currentColor; display:inline-block; }
+
+.yn-yes{ color:var(--user); font-weight:600; }
+.yn-no{ color:var(--muted); }
+.yn-partial{ color:var(--manager); font-weight:600; }
+
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media (max-width:760px){ .grid-2{ grid-template-columns:1fr; } }
+
+.kv{ display:grid; grid-template-columns:max-content 1fr; gap:6px 16px; margin:0; }
+.kv dt{ color:var(--muted); font-size:12.5px; }
+.kv dd{ margin:0; font-size:13.5px; }
+
+.callout{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  padding:12px 16px;
+  border-radius:0 8px 8px 0;
+  font-size:14.5px;
+  color:var(--ink);
+  margin:16px 0;
+}
+.callout b{ color:var(--accent-ink); }
+
+.tag-list{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0; padding:0; list-style:none; }
+.tag-list li{
+  font-family:"IBM Plex Mono",monospace;
+  font-size:12.5px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  padding:4px 10px;
+  border-radius:6px;
+  color:var(--ink);
+}
+
+footer.doc-footer{
+  margin-top:60px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  font-size:12.5px;
+  color:var(--muted);
+  font-family:"IBM Plex Mono",monospace;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+::selection{ background:var(--accent); color:#fff; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <p class="nav-title">RBAC Demo App</p>
+    <p class="nav-sub">Functional Specification v1.0</p>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">System Architecture</a></li>
+      <li><a href="#techstack">Technology Stack</a></li>
+      <li><a href="#auth">Authentication Flow</a></li>
+      <li><a href="#rbac">Roles &amp; Access Control</a></li>
+      <li><a href="#datamodel">Data Model</a></li>
+      <li><a href="#dfd0">DFD — Context (Level 0)</a></li>
+      <li><a href="#dfd1">DFD — Level 1</a></li>
+      <li><a href="#orderlifecycle">Order Lifecycle</a></li>
+      <li><a href="#pages">Page Routes</a></li>
+      <li><a href="#api">API Reference</a></li>
+      <li><a href="#deployment">Deployment View</a></li>
+      <li><a href="#appendix">Appendix</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="cover">
+      <span class="eyebrow">Functional &amp; Data Flow Specification</span>
+      <h1 class="title">Playwright Production Demo App — V3</h1>
+      <p class="dek">A role-based Node.js/Express reference application backed by Supabase Postgres, built to give automation engineers a realistic surface — auth, CRUD, reporting, audit logging — to write Playwright UI and API tests against.</p>
+      <div class="meta-row">
+        <span><b>Version</b> 3.0.0</span>
+        <span><b>Runtime</b> Node.js + Express 4</span>
+        <span><b>Database</b> Supabase Postgres</span>
+        <span><b>Doc date</b> 2026-08-26</span>
+      </div>
+    </header>
+
+    <section id="overview">
+      <h2><span class="num">01</span> Overview</h2>
+      <p>The application is a single Express server (<code>server.js</code>) that serves both a static, vanilla-JS front end (<code>public/pages/*.html</code>) and a JSON REST API under <code>/api/*</code>. There is no client framework and no server-side templating — pages are static HTML shells that call the API via <code>fetch()</code> and render results client-side (<code>public/js/app.js</code>).</p>
+      <p>Authorization is stateless: on login the server issues a signed JWT containing the user's <code>role</code>, which the browser stores in <code>localStorage</code> and replays as a <code>Bearer</code> token on every subsequent request. The server never holds session state — each request is independently authenticated and authorized against the token.</p>
+      <div class="callout"><b>Why this shape matters for testing:</b> because every screen is driven by an equivalent API call, the app is deliberately testable at two layers that must agree — the UI layer (Playwright browser tests) and the API layer (Playwright request tests) — which is the app's stated purpose per <code>tests/ui</code> and <code>tests/api</code>.</div>
+    </section>
+
+    <section id="architecture">
+      <h2><span class="num">02</span> System Architecture</h2>
+      <p class="lede">One Express process owns routing, authentication, and data access. It talks to a single external system: a pooled Postgres connection into Supabase.</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+flowchart TB
+  subgraph CLIENT["Client — Browser"]
+    UI["Static pages + app.js<br/>public/pages/*.html · public/js/app.js<br/>localStorage: JWT + user profile"]
+  end
+  subgraph SERVER["Application Server — server.js (Express)"]
+    MW["Middleware chain<br/>cors · express.json · morgan · /assets static"]
+    AUTH["Auth layer — src/auth.js<br/>signUser · requireAuth · requireRole"]
+    PAGEROUTES["Page routes<br/>GET /login /dashboard /admin ..."]
+    APIROUTES["REST API routes<br/>/api/auth · /api/admin · /api/customers<br/>/api/products · /api/orders · /api/user · /api/reports"]
+    UPLOAD["Upload handler<br/>multer -> /uploads"]
+  end
+  subgraph DATA["Data Layer — src/db.js"]
+    POOL["pg.Pool (max 8, SSL)"]
+    DB[("Supabase Postgres<br/>app_users · customers · products · orders · audit_logs")]
+  end
+
+  UI -- "fetch() + Bearer JWT" --> MW
+  MW --> PAGEROUTES
+  MW --> AUTH
+  AUTH --> APIROUTES
+  APIROUTES --> UPLOAD
+  PAGEROUTES -- "static HTML" --> UI
+  APIROUTES -- "JSON" --> UI
+  APIROUTES -- "parameterized SQL" --> POOL
+  POOL --> DB
+  DB -- "result rows" --> POOL
+  POOL --> APIROUTES
+</pre>
+        </div>
+        <p class="cap">Fig. 1 — Component view. Every write path (create/update/delete) also fans out to <code>audit_logs</code> via the <code>audit()</code> helper in server.js.</p>
+      </div>
+    </section>
+
+    <section id="techstack">
+      <h2><span class="num">03</span> Technology Stack</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Runtime</td><td class="mono">Node.js</td><td>Server runtime</td></tr>
+          <tr><td>Web framework</td><td class="mono">express ^4.21</td><td>Routing, middleware, static serving</td></tr>
+          <tr><td>Database</td><td class="mono">Supabase Postgres</td><td>Managed Postgres; connected via <code>DATABASE_URL</code></td></tr>
+          <tr><td>DB driver</td><td class="mono">pg ^8.13</td><td>Connection pooling, parameterized queries (<code>src/db.js</code>)</td></tr>
+          <tr><td>Auth</td><td class="mono">jsonwebtoken ^9</td><td>Stateless JWT issue/verify (8h expiry)</td></tr>
+          <tr><td>Password hashing</td><td class="mono">bcryptjs ^2.4</td><td>Salted hash storage &amp; comparison</td></tr>
+          <tr><td>File uploads</td><td class="mono">multer ^1.4</td><td><code>POST /api/upload</code> handling</td></tr>
+          <tr><td>Logging</td><td class="mono">morgan</td><td>Dev-format HTTP request logging</td></tr>
+          <tr><td>CORS</td><td class="mono">cors</td><td>Cross-origin access for API clients</td></tr>
+          <tr><td>Front end</td><td class="mono">Vanilla HTML/CSS/JS</td><td>No framework; <code>app.js</code> is a shared fetch/session/render helper</td></tr>
+          <tr><td>Test framework</td><td class="mono">@playwright/test ^1.49</td><td>UI tests (<code>tests/ui</code>) + API tests (<code>tests/api</code>)</td></tr>
+          <tr><td>Deployment</td><td class="mono">Render (render.yaml)</td><td>Web service; build runs schema + seed</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="auth">
+      <h2><span class="num">04</span> Authentication Flow</h2>
+      <p class="lede">Login is the only unauthenticated write. Every other API route is gated by <code>requireAuth</code>, and privileged routes are further gated by <code>requireRole(...)</code>.</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+sequenceDiagram
+  participant B as Browser (login.html)
+  participant S as Express (server.js)
+  participant A as auth.js
+  participant DB as Postgres · app_users
+
+  B->>S: POST /api/auth/login { username, password }
+  S->>DB: select * from app_users where lower(email)=lower($1) and status='active'
+  DB-->>S: user row (incl. password_hash)
+  S->>S: bcrypt.compare(password, password_hash)
+  alt credentials valid
+    S->>A: signUser(user)
+    A-->>S: JWT { sub, role, email, name }, expires in 8h
+    S->>DB: insert into audit_logs (action='LOGIN')
+    S-->>B: 200 { token, user }
+    B->>B: localStorage.setItem(rbacDemoToken, rbacDemoUser)
+    B->>S: subsequent requests carry Authorization: Bearer &lt;token&gt;
+    S->>A: requireAuth() verifies signature + expiry
+    A-->>S: req.user = { sub, role, email, name }
+    S->>A: requireRole(...allowed) checks req.user.role
+  else invalid credentials
+    S-->>B: 401 { error: "Invalid username or password" }
+  end
+</pre>
+        </div>
+        <p class="cap">Fig. 2 — Login &amp; per-request authorization. No server-side session store; the JWT itself is the session.</p>
+      </div>
+      <h3>Token &amp; guard reference</h3>
+      <dl class="kv">
+        <dt>Token claims</dt><dd class="mono">{ sub: user.id, role, email, name }</dd>
+        <dt>Expiry</dt><dd>8 hours (<code>expiresIn: '8h'</code>)</dd>
+        <dt>Transport</dt><dd><code>Authorization: Bearer &lt;token&gt;</code> header, attached by <code>public/js/app.js → api()</code></dd>
+        <dt>Client storage</dt><dd><code>localStorage</code> keys <code>rbacDemoToken</code>, <code>rbacDemoUser</code></dd>
+        <dt><code>requireAuth</code></dt><dd>Verifies signature/expiry; rejects with <code>401</code> on missing or invalid token</dd>
+        <dt><code>requireRole(...roles)</code></dt><dd>Rejects with <code>403</code> if <code>req.user.role</code> is not in the allowed list</dd>
+      </dl>
+    </section>
+
+    <section id="rbac">
+      <h2><span class="num">05</span> Roles &amp; Access Control</h2>
+      <p class="lede">Three fixed roles, enforced identically at the page level (client-side redirect) and the API level (<code>requireRole</code> middleware) — the API is the real boundary; the UI check only avoids showing a screen the API would reject.</p>
+      <div class="grid-2">
+        <div class="card">
+          <span class="role-pill role-admin"><span class="dot"></span>admin</span>
+          <p style="margin-top:10px">Full access to every page and API route, including user management, disabling accounts, and deleting customers.</p>
+        </div>
+        <div class="card">
+          <span class="role-pill role-manager"><span class="dot"></span>manager</span>
+          <p style="margin-top:10px">Operational access: customers, products, orders, reports. No user administration, no customer deletion.</p>
+        </div>
+        <div class="card">
+          <span class="role-pill role-user"><span class="dot"></span>user</span>
+          <p style="margin-top:10px">Self-service only: own profile, own orders (<code>assigned_user_id</code> = self), read-only on customers/products.</p>
+        </div>
+      </div>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Page / capability</th><th>Admin</th><th>Manager</th><th>User</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td></tr>
+          <tr><td>Admin Console (user mgmt, audit log)</td><td class="yn-yes">Yes</td><td class="yn-no">No</td><td class="yn-no">No</td></tr>
+          <tr><td>User Portal (profile, my orders)</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td></tr>
+          <tr><td>Customers — read</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td></tr>
+          <tr><td>Customers — create / update</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-no">No</td></tr>
+          <tr><td>Customers — delete</td><td class="yn-yes">Yes</td><td class="yn-no">No</td><td class="yn-no">No</td></tr>
+          <tr><td>Products — read</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td></tr>
+          <tr><td>Products — create</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-no">No</td></tr>
+          <tr><td>Orders — all orders</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-partial">Own only</td></tr>
+          <tr><td>Orders — create / change status</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-no">No</td></tr>
+          <tr><td>Reports (sales)</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-no">No</td></tr>
+          <tr><td>Components / Iframe Lab / API Explorer / Settings</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td><td class="yn-yes">Yes</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="datamodel">
+      <h2><span class="num">06</span> Data Model</h2>
+      <p class="lede">Five tables in the public Postgres schema (<code>scripts/schema.sql</code>). All primary keys are UUIDs except <code>audit_logs</code>, which is a bigserial append log.</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+erDiagram
+  APP_USERS ||--o{ CUSTOMERS : "owns (owner_id)"
+  APP_USERS ||--o{ ORDERS : "assigned to (assigned_user_id)"
+  CUSTOMERS ||--o{ ORDERS : "places"
+  PRODUCTS  ||--o{ ORDERS : "ordered as"
+
+  APP_USERS {
+    uuid id PK
+    text name
+    text email UK
+    text password_hash
+    text role "admin, manager, user"
+    text status "active, disabled"
+    text department
+  }
+  CUSTOMERS {
+    uuid id PK
+    text customer_no UK
+    text name
+    text email
+    text company
+    text status "Active, Pending, Inactive"
+    text tier "Standard, Gold, Platinum"
+    uuid owner_id FK
+  }
+  PRODUCTS {
+    uuid id PK
+    text sku UK
+    text name
+    text category
+    numeric price
+    int stock
+    text status "Active, Draft, Discontinued"
+  }
+  ORDERS {
+    uuid id PK
+    text order_no UK
+    uuid customer_id FK
+    uuid product_id FK
+    uuid assigned_user_id FK
+    int quantity
+    numeric amount
+    text status "New, Processing, Shipped, Completed, Cancelled"
+    text priority "Low, Normal, High"
+  }
+  AUDIT_LOGS {
+    bigint id PK
+    text actor_email
+    text actor_role
+    text action
+    text entity_type
+    text entity_id
+    jsonb details
+    timestamptz created_at
+  }
+</pre>
+        </div>
+        <p class="cap">Fig. 3 — Entity-relationship diagram. <code>audit_logs</code> has no FK constraint — it stores <code>actor_email</code>/<code>entity_id</code> as free text so it never blocks on a deleted row.</p>
+      </div>
+    </section>
+
+    <section id="dfd0">
+      <h2><span class="num">07</span> Data Flow Diagram — Context (Level 0)</h2>
+      <p class="lede">The whole application as a single process against one data store, seen from the three external roles that use it.</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+flowchart LR
+  admin["Admin User"]
+  manager["Manager User"]
+  euser["Standard User"]
+  proc(("0.0 — RBAC Demo Application"))
+  db[("D1 — Supabase Postgres")]
+
+  admin -->|"login credentials, CRUD requests + JWT"| proc
+  manager -->|"login credentials, CRUD requests + JWT"| proc
+  euser -->|"login credentials, profile/order requests + JWT"| proc
+  proc -->|"JWT, HTML pages, JSON responses"| admin
+  proc -->|"JWT, HTML pages, JSON responses"| manager
+  proc -->|"JWT, HTML pages, JSON responses"| euser
+  proc -->|"parameterized SQL"| db
+  db -->|"result rows"| proc
+</pre>
+        </div>
+        <p class="cap">Fig. 4 — Context diagram. Circle = process, rectangle = external entity, cylinder = data store (standard Gane–Sarson DFD notation).</p>
+      </div>
+    </section>
+
+    <section id="dfd1">
+      <h2><span class="num">08</span> Data Flow Diagram — Level 1</h2>
+      <p class="lede">Process 0.0 decomposed into its seven functional processes and the five data stores they read or write. Every write process (2.0–5.0) fans out to 7.0, which is the only writer of <code>audit_logs</code>.</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+flowchart TD
+  A["Admin User"]
+  M["Manager User"]
+  U["Standard User"]
+
+  P1((" 1.0 Authenticate &amp; Authorize "))
+  P2((" 2.0 Manage Users "))
+  P3((" 3.0 Manage Customers "))
+  P4((" 4.0 Manage Products "))
+  P5((" 5.0 Manage Orders "))
+  P6((" 6.0 Generate Reports "))
+  P7((" 7.0 Record Audit Trail "))
+
+  D1[("D1 app_users")]
+  D2[("D2 customers")]
+  D3[("D3 products")]
+  D4[("D4 orders")]
+  D5[("D5 audit_logs")]
+
+  A --> P1
+  M --> P1
+  U --> P1
+  P1 <--> D1
+  P1 -.->|JWT| A
+  P1 -.->|JWT| M
+  P1 -.->|JWT| U
+
+  A -->|"JWT + user CRUD"| P2
+  P2 <--> D1
+  P2 --> P7
+
+  A -->|"JWT + customer CRUD"| P3
+  M -->|"JWT + customer CRUD"| P3
+  U -->|"JWT, read-only"| P3
+  P3 <--> D2
+  P3 --> P7
+
+  A -->|"JWT + product CRUD"| P4
+  M -->|"JWT + product CRUD"| P4
+  U -->|"JWT, read-only"| P4
+  P4 <--> D3
+  P4 --> P7
+
+  A -->|"JWT + order CRUD"| P5
+  M -->|"JWT + order CRUD"| P5
+  U -->|"JWT, own orders only"| P5
+  P5 <--> D4
+  P5 -.->|reads| D2
+  P5 -.->|reads| D3
+  P5 --> P7
+
+  A -->|"JWT + report request"| P6
+  M -->|"JWT + report request"| P6
+  P6 -.->|reads| D4
+  P6 -.->|reads| D2
+
+  P7 --> D5
+  A -->|"JWT + audit/stat query"| P2
+</pre>
+        </div>
+        <p class="cap">Fig. 5 — Level 1 DFD. Solid arrows are primary read/write flows; dashed arrows are secondary reads or returned data (e.g. JWT issuance, join lookups). Numbering mirrors the route groups in server.js.</p>
+      </div>
+      <h3>Process reference</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>ID</th><th>Process</th><th>Server routes</th><th>Data stores touched</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1.0</td><td>Authenticate &amp; Authorize</td><td class="mono">POST /api/auth/login · GET /api/auth/me</td><td class="mono">D1 (read), D5 (write on login)</td></tr>
+          <tr><td class="mono">2.0</td><td>Manage Users</td><td class="mono">GET/POST/PUT/DELETE /api/admin/users · GET /api/admin/audit · GET /api/admin/stats</td><td class="mono">D1 (read/write), D5 (read)</td></tr>
+          <tr><td class="mono">3.0</td><td>Manage Customers</td><td class="mono">GET/POST/PUT/DELETE /api/customers</td><td class="mono">D2 (read/write), D1 (read, owner join)</td></tr>
+          <tr><td class="mono">4.0</td><td>Manage Products</td><td class="mono">GET/POST /api/products</td><td class="mono">D3 (read/write)</td></tr>
+          <tr><td class="mono">5.0</td><td>Manage Orders</td><td class="mono">GET/POST /api/orders · PUT /api/orders/:id/status · GET /api/user/orders</td><td class="mono">D4 (read/write), D2 &amp; D3 (read, joins)</td></tr>
+          <tr><td class="mono">6.0</td><td>Generate Reports</td><td class="mono">GET /api/reports/sales</td><td class="mono">D4 (read), D2 (read)</td></tr>
+          <tr><td class="mono">7.0</td><td>Record Audit Trail</td><td class="mono">internal <code>audit()</code> helper, called from every mutating route</td><td class="mono">D5 (write only)</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="orderlifecycle">
+      <h2><span class="num">09</span> Order Lifecycle</h2>
+      <p class="lede">Orders move through a fixed status set enforced by a Postgres <code>check</code> constraint on <code>orders.status</code>; transitions are performed via <code>PUT /api/orders/:id/status</code> (admin/manager only).</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> New : admin/manager creates order
+  New --> Processing
+  Processing --> Shipped
+  Shipped --> Completed
+  New --> Cancelled
+  Processing --> Cancelled
+  Completed --> [*]
+  Cancelled --> [*]
+</pre>
+        </div>
+        <p class="cap">Fig. 6 — Order status state machine. Each transition writes a new row to <code>audit_logs</code> with action <code>UPDATE_ORDER_STATUS</code>.</p>
+      </div>
+    </section>
+
+    <section id="pages">
+      <h2><span class="num">10</span> Page Routes</h2>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Route</th><th>File served</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="mono path">/</td><td class="mono">redirect → /login</td><td>Entry point</td></tr>
+          <tr><td class="mono path">/login</td><td class="mono">login.html</td><td>Credential entry, obtains JWT</td></tr>
+          <tr><td class="mono path">/dashboard</td><td class="mono">dashboard.html</td><td>Metrics summary (customers, orders, revenue, products, users, my orders)</td></tr>
+          <tr><td class="mono path">/admin</td><td class="mono">admin.html</td><td>User management, audit log, role stats — admin only</td></tr>
+          <tr><td class="mono path">/users</td><td class="mono">users.html</td><td>User self-service portal (profile, my orders)</td></tr>
+          <tr><td class="mono path">/customers</td><td class="mono">customers.html</td><td>Customer CRUD list</td></tr>
+          <tr><td class="mono path">/orders</td><td class="mono">orders.html</td><td>Order workflow &amp; status changes</td></tr>
+          <tr><td class="mono path">/products</td><td class="mono">products.html</td><td>Product catalog CRUD</td></tr>
+          <tr><td class="mono path">/reports</td><td class="mono">reports.html</td><td>Sales-by-status and sales-by-tier reporting</td></tr>
+          <tr><td class="mono path">/components</td><td class="mono">components.html</td><td>Modern UI component gallery (automation targets)</td></tr>
+          <tr><td class="mono path">/iframe-lab</td><td class="mono">iframe-lab.html</td><td>Iframe + shadow DOM test surface</td></tr>
+          <tr><td class="mono path">/iframe-content</td><td class="mono">iframe-content.html</td><td>Content frame embedded by iframe-lab</td></tr>
+          <tr><td class="mono path">/api-explorer</td><td class="mono">api-explorer.html</td><td>In-app API call console</td></tr>
+          <tr><td class="mono path">/settings</td><td class="mono">settings.html</td><td>User preferences</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="api">
+      <h2><span class="num">11</span> API Reference</h2>
+      <p class="lede">All paths are prefixed <code>/api</code>. Every route except <code>/auth/login</code> and <code>/health</code> requires <code>Authorization: Bearer &lt;JWT&gt;</code>.</p>
+
+      <h3>Auth &amp; profile</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/health</td><td>None</td><td>App + DB connectivity check</td></tr>
+          <tr><td class="method"><span class="m m-post">POST</span></td><td class="mono path">/api/auth/login</td><td>None</td><td>Verifies credentials, returns JWT + user, logs <code>LOGIN</code></td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/auth/me</td><td>Any role</td><td>Returns the authenticated user's profile</td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/dashboard</td><td>Any role</td><td>Aggregate counts: customers, orders, revenue, products, users, my orders</td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/user/profile</td><td>Any role</td><td>Current user's profile record</td></tr>
+          <tr><td class="method"><span class="m m-put">PUT</span></td><td class="mono path">/api/user/profile</td><td>Any role</td><td>Update own name/department; logs <code>UPDATE_PROFILE</code></td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/user/orders</td><td>Any role</td><td>Orders assigned to the current user</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Admin — users &amp; audit</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Role</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/admin/users</td><td><span class="role-pill role-admin">admin</span></td><td>List all users</td></tr>
+          <tr><td class="method"><span class="m m-post">POST</span></td><td class="mono path">/api/admin/users</td><td><span class="role-pill role-admin">admin</span></td><td>Create user (hashes password); logs <code>CREATE_USER</code></td></tr>
+          <tr><td class="method"><span class="m m-put">PUT</span></td><td class="mono path">/api/admin/users/:id</td><td><span class="role-pill role-admin">admin</span></td><td>Update name/role/status/department; logs <code>UPDATE_USER</code></td></tr>
+          <tr><td class="method"><span class="m m-delete">DELETE</span></td><td class="mono path">/api/admin/users/:id</td><td><span class="role-pill role-admin">admin</span></td><td>Soft-delete: sets <code>status='disabled'</code>; logs <code>DISABLE_USER</code></td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/admin/audit</td><td><span class="role-pill role-admin">admin</span></td><td>Last 50 audit log entries</td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/admin/stats</td><td><span class="role-pill role-admin">admin</span></td><td>User counts by role, order counts by status</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Customers</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Role</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/customers</td><td>Any role</td><td>List with <code>search</code>/<code>status</code> filters, owner name join</td></tr>
+          <tr><td class="method"><span class="m m-post">POST</span></td><td class="mono path">/api/customers</td><td><span class="role-pill role-admin">admin</span> <span class="role-pill role-manager">manager</span></td><td>Create; logs <code>CREATE_CUSTOMER</code></td></tr>
+          <tr><td class="method"><span class="m m-put">PUT</span></td><td class="mono path">/api/customers/:id</td><td><span class="role-pill role-admin">admin</span> <span class="role-pill role-manager">manager</span></td><td>Update; logs <code>UPDATE_CUSTOMER</code></td></tr>
+          <tr><td class="method"><span class="m m-delete">DELETE</span></td><td class="mono path">/api/customers/:id</td><td><span class="role-pill role-admin">admin</span></td><td>Hard delete; logs <code>DELETE_CUSTOMER</code></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Products</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Role</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/products</td><td>Any role</td><td>List all products</td></tr>
+          <tr><td class="method"><span class="m m-post">POST</span></td><td class="mono path">/api/products</td><td><span class="role-pill role-admin">admin</span> <span class="role-pill role-manager">manager</span></td><td>Create; logs <code>CREATE_PRODUCT</code></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Orders &amp; reports</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Role</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/orders</td><td>Any role</td><td>All orders (managers/admins), or own orders only (role=user, or <code>?mine=true</code>)</td></tr>
+          <tr><td class="method"><span class="m m-post">POST</span></td><td class="mono path">/api/orders</td><td><span class="role-pill role-admin">admin</span> <span class="role-pill role-manager">manager</span></td><td>Create order; logs <code>CREATE_ORDER</code></td></tr>
+          <tr><td class="method"><span class="m m-put">PUT</span></td><td class="mono path">/api/orders/:id/status</td><td><span class="role-pill role-admin">admin</span> <span class="role-pill role-manager">manager</span></td><td>Transition status; logs <code>UPDATE_ORDER_STATUS</code></td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/reports/sales</td><td><span class="role-pill role-admin">admin</span> <span class="role-pill role-manager">manager</span></td><td>Revenue/count by order status and by customer tier</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Automation utility endpoints</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Method</th><th>Path</th><th>Role</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="method"><span class="m m-post">POST</span></td><td class="mono path">/api/upload</td><td>Any role</td><td>Multipart file upload (multer, single field <code>file</code>)</td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/delay?ms=</td><td>Any role</td><td>Echoes back after a delay, capped at 5000ms — for wait-state testing</td></tr>
+          <tr><td class="method"><span class="m m-get">GET</span></td><td class="mono path">/api/status/:code</td><td>Any role</td><td>Returns the requested HTTP status (100–599) — for error-handling tests</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="deployment">
+      <h2><span class="num">12</span> Deployment View</h2>
+      <p class="lede">Local development and the Render production deployment both point at the same Supabase Postgres instance via <code>DATABASE_URL</code>; only the compute host differs.</p>
+      <div class="card diagram-card">
+        <div class="diagram-scroll">
+<pre class="mermaid">
+flowchart LR
+  users["End Users / Playwright Test Runners"]
+
+  subgraph LOCAL["Local Dev"]
+    devnode["node server.js — :3001"]
+  end
+
+  subgraph RENDER["Render.com — Web Service"]
+    render["npm install &amp;&amp; npm run db:schema &amp;&amp; npm run db:seed<br/>npm start"]
+  end
+
+  subgraph SUPA["Supabase Cloud"]
+    pg[("Pooled Postgres, sslmode=require")]
+  end
+
+  users -- "HTTP :3001, local" --> devnode
+  users -- "HTTPS" --> render
+  devnode -- "DATABASE_URL (SSL)" --> pg
+  render -- "DATABASE_URL (SSL)" --> pg
+</pre>
+        </div>
+        <p class="cap">Fig. 7 — Deployment topology. Render supplies <code>PORT</code> at runtime; <code>JWT_SECRET</code> is auto-generated per <code>render.yaml</code>.</p>
+      </div>
+    </section>
+
+    <section id="appendix">
+      <h2><span class="num">13</span> Appendix</h2>
+
+      <h3>Demo accounts (seeded by <code>scripts/seed.js</code>)</h3>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Role</th><th>Email</th><th>Password</th><th>Department</th></tr></thead>
+        <tbody>
+          <tr><td><span class="role-pill role-admin">admin</span></td><td class="mono">admin@example.com</td><td class="mono">password123</td><td>Platform Admin</td></tr>
+          <tr><td><span class="role-pill role-manager">manager</span></td><td class="mono">manager@example.com</td><td class="mono">manager123</td><td>Operations</td></tr>
+          <tr><td><span class="role-pill role-user">user</span></td><td class="mono">user@example.com</td><td class="mono">user123</td><td>Customer Success</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Environment variables</h3>
+      <div class="table-scroll">
+      <table class="env-table">
+        <thead><tr><th>Variable</th><th>Example / default</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>DATABASE_URL</td><td class="mono">postgresql://postgres.&lt;ref&gt;:&lt;pw&gt;@…supabase.com:5432/postgres?sslmode=require</td><td>Supabase pooled connection string; SSL auto-enabled for non-localhost hosts</td></tr>
+          <tr><td>JWT_SECRET</td><td class="mono">long random string</td><td>Signs/verifies session tokens; auto-generated on Render</td></tr>
+          <tr><td>NODE_ENV</td><td class="mono">development / production</td><td></td></tr>
+          <tr><td>PORT</td><td class="mono">3001</td><td>Render overrides this at runtime</td></tr>
+          <tr><td>UPLOAD_DIR</td><td class="mono">uploads</td><td>Destination for <code>/api/upload</code></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>NPM scripts</h3>
+      <ul class="tag-list">
+        <li>npm start</li>
+        <li>npm run dev</li>
+        <li>npm run db:schema</li>
+        <li>npm run db:seed</li>
+        <li>npm run db:reset</li>
+        <li>npm test</li>
+        <li>npm run test:ui</li>
+        <li>npm run test:api</li>
+        <li>npm run test:headed</li>
+        <li>npm run install:browsers</li>
+      </ul>
+    </section>
+
+    <footer class="doc-footer">
+      <span>Source: c:\DevPlaywright\playwright-production-demo-app-v3-supabase-rbac</span>
+      <span>Generated 2026-08-26</span>
+    </footer>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  function currentMermaidTheme() {
+    var stamped = document.documentElement.getAttribute('data-theme');
+    if (stamped === 'dark') return 'dark';
+    if (stamped === 'light') return 'default';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
+  }
+  mermaid.initialize({ startOnLoad: true, theme: currentMermaidTheme(), securityLevel: 'loose' });
+</script>
+
+</body>
+</html>

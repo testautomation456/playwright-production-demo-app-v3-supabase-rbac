@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="dashboard-title">Dashboard</h1><p>Role-aware landing page with live database metrics.</p></div><span class="pill">Current role: <b data-dashboard-role></b></span></div>
+    <section class="grid cols-4">
+      <div class="card metric"><div><span>Customers</span><strong data-metric-customers>--</strong></div><div class="icon">🏢</div></div>
+      <div class="card metric"><div><span>Orders</span><strong data-metric-orders>--</strong></div><div class="icon">📦</div></div>
+      <div class="card metric"><div><span>Revenue</span><strong data-metric-revenue>--</strong></div><div class="icon">💰</div></div>
+      <div class="card metric"><div><span>Users</span><strong data-metric-users>--</strong></div><div class="icon">👥</div></div>
+    </section>
+    <section class="grid cols-2" style="margin-top:18px">
+      <div class="card"><h2>Automation Coverage</h2><p class="hint">Use this portal for login, protected routes, RBAC, forms, CRUD grids, reports, iframe testing, Shadow DOM, delayed APIs, upload APIs, and role-based negative testing.</p></div>
+      <div class="card"><h2>Suggested tests</h2><p class="hint">Admin should see Admin Console. User should not see Admin Console. Manager can create customers. User can view only assigned orders. API should return 403 when role is invalid.</p></div>
+    </section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageDashboard()</script>
+</body></html>

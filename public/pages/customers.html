@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Customers | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="customers-title">Customers</h1><p>Manager/Admin CRUD page backed by Supabase Postgres.</p></div><input data-search data-testid="customer-search" placeholder="Search customers..."></div>
+    <section class="split">
+      <form class="card" data-customer-form><h2>Create customer</h2><div class="form-row"><label>Customer No</label><input name="customer_no" value="CUST-AUTO-1" required></div><div class="form-row"><label>Name</label><input name="name" data-testid="customer-name" required></div><div class="form-row"><label>Email</label><input name="email" type="email" required></div><div class="form-row"><label>Company</label><input name="company" required></div><div class="form-row"><label>Status</label><select name="status"><option>Active</option><option>Pending</option><option>Inactive</option></select></div><div class="form-row"><label>Tier</label><select name="tier"><option>Standard</option><option>Gold</option><option>Platinum</option></select></div><button class="btn" data-testid="create-customer">Create customer</button></form>
+      <div class="card"><h2>Customer grid</h2><div class="table-wrap"><table><thead><tr><th>Customer No</th><th>Name</th><th>Company</th><th>Status</th><th>Tier</th><th>Owner</th><th>Actions</th></tr></thead><tbody data-customers-body></tbody></table></div></div>
+    </section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageCustomers()</script>
+</body></html>

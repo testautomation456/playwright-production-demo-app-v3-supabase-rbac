@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reports | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="reports-title">Reports</h1><p>Sales analytics from Postgres. Good for API and UI assertion practice.</p></div></div>
+    <section class="grid cols-2"><div class="card"><h2>Revenue by status</h2><div class="table-wrap"><table><thead><tr><th>Status</th><th>Orders</th><th>Revenue</th></tr></thead><tbody data-report-status></tbody></table></div></div><div class="card"><h2>Revenue by customer tier</h2><div class="table-wrap"><table><thead><tr><th>Tier</th><th>Orders</th><th>Revenue</th></tr></thead><tbody data-report-tier></tbody></table></div></div></section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageReports()</script>
+</body></html>

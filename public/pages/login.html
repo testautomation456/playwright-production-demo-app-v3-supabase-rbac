@@ -1,0 +1,29 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login | Playwright Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="login-shell">
+  <section class="hero">
+    <span class="hero-badge">⚡ Playwright Automation Practice Portal</span>
+    <h1>Modern web app for UI, API, DB, and role-based automation.</h1>
+    <p>This demo uses Express, Supabase Postgres, JWT auth, admin/user roles, dynamic elements, iframes, Shadow DOM, modals, grids, CRUD pages, and API endpoints.</p>
+    <div class="feature-grid">
+      <div class="feature-card"><strong>Role-based pages</strong><span>Admin, Manager, and User menus with protected APIs.</span></div>
+      <div class="feature-card"><strong>Supabase Postgres</strong><span>Real database-backed users, customers, products, and orders.</span></div>
+      <div class="feature-card"><strong>UI automation lab</strong><span>Modal, toast, drag/drop, dynamic load, Shadow DOM, iframe.</span></div>
+      <div class="feature-card"><strong>API automation</strong><span>Login, CRUD, status codes, delayed API, upload endpoints.</span></div>
+    </div>
+  </section>
+  <section class="login-panel">
+    <form class="login-card" data-login-form>
+      <div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div>
+      <h2>Sign in</h2>
+      <p class="hint">Admin: admin@example.com / password123<br>Manager: manager@example.com / manager123<br>User: user@example.com / user123</p>
+      <div class="form-stack">
+        <div><label for="username">Email</label><input id="username" name="username" data-testid="login-username" autocomplete="username" value="admin@example.com"></div>
+        <div><label for="password">Password</label><input id="password" name="password" data-testid="login-password" type="password" autocomplete="current-password" value="password123"></div>
+        <button class="btn" data-testid="login-submit">Login</button>
+        <div class="error" data-login-error data-testid="login-error"></div>
+      </div>
+    </form>
+  </section>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageLogin()</script>
+</body></html>

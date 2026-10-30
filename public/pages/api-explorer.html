@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>API | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="api-title">API Explorer</h1><p>Call protected API endpoints from the UI and verify output.</p></div></div>
+    <section class="split"><div class="card"><h2>Request</h2><div class="form-row"><label>Method</label><select data-api-method data-testid="api-method"><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select></div><div class="form-row"><label>Path</label><input data-api-path data-testid="api-path" value="/api/health"></div><div class="form-row"><label>Body JSON</label><textarea data-api-body rows="8">{}</textarea></div><button class="btn" data-api-send data-testid="api-send">Send API request</button></div><div class="card"><h2>Response</h2><pre data-api-output data-testid="api-output">Click Send API request...</pre></div></section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageApiExplorer()</script>
+</body></html>

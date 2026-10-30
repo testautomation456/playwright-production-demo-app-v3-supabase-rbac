@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Settings | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="settings-title">Settings</h1><p>Profile, upload, and role visibility checks.</p></div><span class="badge">Role: <span data-role-text></span></span></div>
+    <section class="grid cols-2"><form class="card" data-upload-form><h2>File upload</h2><p class="hint">Use this for Playwright file upload automation.</p><input type="file" name="file" data-test-upload data-testid="file-upload"><p class="hint">Selected: <span data-upload-name>No file selected</span></p><button class="btn">Upload</button></form><div class="card"><h2>Role-based visibility</h2><p class="hint">Admin users can see the Admin Console menu. Managers can manage business objects. Standard users can access the User Portal, Components, Iframe Lab, API Explorer, and Settings.</p></div></section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageSettings()</script>
+</body></html>

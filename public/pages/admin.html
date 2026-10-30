@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="admin-title">Admin Console</h1><p>Role-based administration page. Only admin can access this page.</p></div><span class="badge ok">Admin only</span></div>
+    <section class="split">
+      <form class="card" data-create-user-form>
+        <h2>Create user</h2>
+        <div class="form-row"><label>Name</label><input name="name" data-testid="new-user-name" required placeholder="Test User"></div>
+        <div class="form-row"><label>Email</label><input name="email" data-testid="new-user-email" type="email" required placeholder="testuser@example.com"></div>
+        <div class="form-row"><label>Password</label><input name="password" data-testid="new-user-password" type="password" value="test123" required></div>
+        <div class="form-row"><label>Role</label><select name="role" data-testid="new-user-role"><option value="user">User</option><option value="manager">Manager</option><option value="admin">Admin</option></select></div>
+        <div class="form-row"><label>Department</label><input name="department" value="QA Automation"></div>
+        <button class="btn" data-testid="create-user-submit">Create user</button>
+      </form>
+      <div class="grid">
+        <div class="card"><h2>User management</h2><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Department</th><th>Actions</th></tr></thead><tbody data-users-body></tbody></table></div></div>
+        <div class="card"><h2>Audit log</h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Actor</th><th>Action</th><th>Entity</th></tr></thead><tbody data-audit-body></tbody></table></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageAdmin()</script>
+</body></html>

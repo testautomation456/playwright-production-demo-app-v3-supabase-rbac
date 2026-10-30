@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Iframe | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="iframe-title">Iframe Lab</h1><p>Dedicated iframe page for Playwright frameLocator practice.</p></div></div>
+    <section class="card"><iframe src="/iframe-content" data-testid="practice-iframe" title="Practice iframe"></iframe></section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageIframeLab()</script>
+</body></html>

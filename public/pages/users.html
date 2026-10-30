@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>User | Enterprise Demo</title><link rel="stylesheet" href="/assets/css/app.css"></head><body>
+<div class="app-layout">
+  <aside class="sidebar"><div class="logo"><span class="logo-mark">QA</span><span>Enterprise Demo</span></div><nav class="nav" data-nav></nav><div class="user-chip"><strong data-user-name>Loading...</strong><span data-user-role></span></div></aside>
+  <main class="main">
+    <div class="topbar"><div><h1 data-testid="users-title">User Portal</h1><p>Self-service user page available to every authenticated role.</p></div><span class="pill">Role: <b data-current-role></b></span></div>
+    <section class="split">
+      <div class="grid">
+        <div class="card" data-profile><h2>Loading profile...</h2></div>
+        <form class="card" data-profile-form><h2>Edit profile</h2><div class="form-row"><label>Name</label><input name="name" data-testid="profile-name"></div><div class="form-row"><label>Department</label><input name="department" data-testid="profile-department"></div><button class="btn" data-testid="profile-save">Save profile</button></form>
+      </div>
+      <div class="card"><h2>My assigned orders</h2><div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Status</th><th>Amount</th></tr></thead><tbody data-my-orders-body></tbody></table></div></div>
+    </section>
+  </main>
+</div>
+<script src="/assets/js/app.js"></script><script>DemoApp.pageUsers()</script>
+</body></html>
