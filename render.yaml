@@ -3,8 +3,10 @@ services:
     name: playwright-production-demo-app-v3
     runtime: node
     plan: free
-    buildCommand: npm install && npm run db:schema && npm run db:seed
+    buildCommand: npm install && npm run db:schema
     startCommand: npm start
+    autoDeployTrigger: commit
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
