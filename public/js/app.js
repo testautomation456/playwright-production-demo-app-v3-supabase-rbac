@@ -146,12 +146,19 @@ async function pageAdmin() {
       <tr data-user-row="${u.email}">
         <td>${escapeHtml(u.name)}</td><td>${escapeHtml(u.email)}</td><td>${badge(u.role)}</td><td>${badge(u.status)}</td><td>${escapeHtml(u.department)}</td>
         <td class="actions">
-          <button class="btn small secondary" data-disable-user="${u.id}">Disable</button>
+          ${u.status === 'disabled'
+            ? `<button class="btn small secondary" data-enable-user="${u.id}">Enable</button>`
+            : `<button class="btn small secondary" data-disable-user="${u.id}">Disable</button>`}
         </td>
       </tr>`).join('');
     document.querySelectorAll('[data-disable-user]').forEach(btn => btn.addEventListener('click', async () => {
       await api(`/api/admin/users/${btn.dataset.disableUser}`, { method: 'DELETE' });
       toast('User disabled');
+      loadUsers(); loadAudit();
+    }));
+    document.querySelectorAll('[data-enable-user]').forEach(btn => btn.addEventListener('click', async () => {
+      await api(`/api/admin/users/${btn.dataset.enableUser}`, { method: 'PUT', body: JSON.stringify({ status: 'active' }) });
+      toast('User enabled');
       loadUsers(); loadAudit();
     }));
   }

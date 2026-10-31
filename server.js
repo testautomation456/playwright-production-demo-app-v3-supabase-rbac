@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
@@ -29,7 +31,21 @@ fs.mkdirSync(uploadDir, { recursive: true });
 
 const upload = multer({ dest: uploadDir });
 
-app.use(cors());
+app.set('trust proxy', 1); // Render terminates TLS in front of the app
+app.disable('x-powered-by');
+app.use(helmet({ contentSecurityPolicy: false })); // pages use inline scripts, so CSP stays off for now
+
+// Same-origin by default; set CORS_ORIGINS=https://a.com,https://b.com to allow other origins.
+const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',').map((o) => o.trim()).filter(Boolean);
+app.use(cors(allowedOrigins.length ? { origin: allowedOrigins } : { origin: false }));
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: Number(process.env.LOGIN_RATE_LIMIT || (process.env.NODE_ENV === 'production' ? 20 : 1000)),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many login attempts, try again later' }
+});
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -79,7 +95,7 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { username, email, password } = req.body;
   const login = username || email;
 

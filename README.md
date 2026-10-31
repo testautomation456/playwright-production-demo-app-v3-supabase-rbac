@@ -29,7 +29,7 @@ A production-style local/cloud demo application for Playwright UI automation and
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@example.com | password123 |
+| Admin | admin@example.com | internal only (set via `ADMIN_PASSWORD`) |
 | Manager | manager@example.com | manager123 |
 | User | user@example.com | user123 |
 
@@ -125,7 +125,7 @@ Invoke-RestMethod `
   -Uri "http://localhost:3001/api/auth/login" `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"username":"admin@example.com","password":"password123"}'
+  -Body '{"username":"manager@example.com","password":"manager123"}'
 ```
 
 ## Run tests

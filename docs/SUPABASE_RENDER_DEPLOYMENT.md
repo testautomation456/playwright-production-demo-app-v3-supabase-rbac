@@ -74,7 +74,6 @@ https://your-render-app.onrender.com/login
 Use:
 
 ```text
-admin@example.com / password123
 manager@example.com / manager123
 user@example.com / user123
 ```

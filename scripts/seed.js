@@ -30,7 +30,17 @@ async function upsertUser({ name, email, password, role, department }) {
 async function main() {
   await ensureSchema();
 
-  const admin = await upsertUser({ name: 'Admin User', email: 'admin@example.com', password: 'password123', role: 'admin', department: 'Platform Admin' });
+  // The admin password is never stored in the repo. Set ADMIN_PASSWORD to create/reset the admin;
+  // without it, an existing admin is left untouched.
+  const adminEmail = 'admin@example.com';
+  let admin;
+  if (process.env.ADMIN_PASSWORD) {
+    admin = await upsertUser({ name: 'Admin User', email: adminEmail, password: process.env.ADMIN_PASSWORD, role: 'admin', department: 'Platform Admin' });
+  } else {
+    admin = (await query('select * from app_users where email=$1', [adminEmail])).rows[0];
+    if (!admin) throw new Error('No admin user exists yet. Set ADMIN_PASSWORD and run the seed again.');
+    console.log('ADMIN_PASSWORD not set: existing admin user left unchanged.');
+  }
   const manager = await upsertUser({ name: 'Manager User', email: 'manager@example.com', password: 'manager123', role: 'manager', department: 'Operations' });
   const user = await upsertUser({ name: 'Standard User', email: 'user@example.com', password: 'user123', role: 'user', department: 'Customer Success' });
 
@@ -97,7 +107,6 @@ async function main() {
   );
 
   console.log('Database seeded successfully.');
-  console.log('Admin login: admin@example.com / password123');
   console.log('Manager login: manager@example.com / manager123');
   console.log('User login: user@example.com / user123');
 }
