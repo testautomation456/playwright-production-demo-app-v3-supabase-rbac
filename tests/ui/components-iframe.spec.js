@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 // Uses the admin session saved by tests/setup/auth.setup.js (see playwright.config.js).
-
+// Tests for modal toast, dynamic content, and iframe automation.
 test('modal toast and dynamic content work', async ({ page }) => {
   await page.goto('/components');
   await page.getByTestId('open-modal').click();
@@ -11,7 +11,8 @@ test('modal toast and dynamic content work', async ({ page }) => {
   await page.getByTestId('load-dynamic').click();
   await expect(page.getByTestId('dynamic-result')).toContainText('Dynamic content loaded');
 });
-
+// End of modal toast and dynamic content test.
+// test for iframe automation.
 test('iframe lab can be automated with frameLocator', async ({ page }) => {
   await page.goto('/iframe-lab');
   const frame = page.frameLocator('[data-testid="practice-iframe"]');
